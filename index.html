@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CF & AT 题目跳转</title>
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --input-bg: #ffffff;
+      --border: #dddddd;
+      --button-bg: #1a73e8;
+      --button-hover: #1558b0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #121212;
+        --card-bg: #1e1e1e;
+        --text: #e0e0e0;
+        --input-bg: #2a2a2a;
+        --border: #333333;
+        --button-bg: #3a7ff6;
+        --button-hover: #2d6fcc;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+    .container {
+      max-width: 700px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .card header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 1.25rem;
+      font-weight: bold;
+      text-align: center;
+    }
+    .card .content {
+      padding: 1.5rem;
+    }
+    .card label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    .card input[type="text"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 1rem;
+    }
+    .card button {
+      display: block;
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      font-size: 1rem;
+      background: var(--button-bg);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .card button:hover {
+      background: var(--button-hover);
+    }
+    details {
+      margin-top: 1rem;
+    }
+    details summary {
+      cursor: pointer;
+      font-weight: bold;
+      list-style: none;
+      padding: 0.5rem;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    details[open] summary {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    .danmaku-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 9999;
+    }
+    .danmaku {
+      position: absolute;
+      white-space: nowrap;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      animation: danmaku 10s linear infinite;
+    }
+    @keyframes danmaku {
+      from { transform: translateX(100vw); }
+      to { transform: translateX(-100%); }
+    }
+    ul {
+      margin: 1rem 0;
+      padding-left: 1rem;
+    }
+    ul li {
+      margin-bottom: 0.75rem;
+      word-break: break-all;
+    }
+    a {
+      color: var(--button-bg);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .footer {
+      text-align: center;
+      margin: 2rem 0;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    .footer a {
+      color: var(--button-bg);
+      text-decoration: none;
+    }
+    .qa-section {
+      margin-top: 3rem;
+      padding: 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .qa-section h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .qa-section dt {
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    .qa-section dd {
+      margin-left: 1rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <header>CF & AT 题目跳转</header>
+      <div class="content">
+        <label for="problemInput">请复制完整的题面链接或编号</label>
+        <input id="problemInput" type="text" placeholder="请复制完整的题面链接">
+        <details>
+          <summary>彩蛋</summary>
+          <div style="padding: 1rem; text-align: center;">Ciallo～(∠・ω<)⌒★</div>
+        </details>
+        <button id="goButton">生成链接</button>
+        <ul id="linksList"></ul>
+      </div>
+    </div>
+    <div class="qa-section">
+      <h2>Q & A</h2>
+      <dl>
+        <dt>Q: 制作这个的原因？</dt>
+        <dd>A: 练习使用大语言模型（LLM）的能力，并且来回看题面很糟心</dd>
+
+        <dt>Q: 有些题在 CF 上看得到，为什么洛谷看不到？</dt>
+        <dd>A: 
+          <ol>
+            <li>洛谷没爬</li>
+            <li>Codeforces 的部分同场 div.1 和 div.2 有些题目相同，只爬了其中一个（eg. CF2081D and CF2082F）</li>
+          </ol>
+        </dd>
+
+        <dt>Q: 有 bug</dt>
+        <dd>A: 联系我 <a href="https://blog.tsumugi.icu/about/" target="_blank">https://blog.tsumugi.icu/about/</a></dd>
+      </dl>
+    </div>
+    <div class="footer">
+      Built by <a href="https://github.com/co7ahang" target="_blank">@co7ahang</a> with ❤️ and OpenAI o4-mini
+    </div>
+  </div>
+  <script>
+    function createDanmaku(text) {
+      const container = document.createElement('div');
+      container.className = 'danmaku-container';
+      for (let i = 0; i < 5; i++) {
+        const danmaku = document.createElement('div');
+        danmaku.className = 'danmaku';
+        danmaku.textContent = text;
+        const fontSize = Math.floor(Math.random() * 24 + 16);
+        const color = `hsl(${Math.random() * 360}deg, 100%, 50%)`;
+        const top = Math.random() * 90 + 5;
+        const delay = Math.random() * 5;
+        danmaku.style.cssText = `font-size: ${fontSize}px; color: ${color}; top: ${top}%; animation-delay: -${delay}s;`;
+        container.appendChild(danmaku);
+      }
+      document.body.appendChild(container);
+      setTimeout(() => container.remove(), 10000);
+    }
+    function playCiallo() {
+      const audio = new Audio('ciallo.mp3');
+      audio.play().catch(e => console.log('需要用户交互后才能播放音频'));
+    }
+    document.querySelector('details summary').addEventListener('click', () => {
+      createDanmaku('Ciallo～(∠・ω<)⌒★');
+      playCiallo();
+    });
+    document.getElementById('goButton').addEventListener('click', () => {
+      const raw = document.getElementById('problemInput').value.trim();
+      if (!raw) return;
+      let contest, idx, origin, full;
+      const url = raw;
+      let match;
+      match = url.match(/vjudge\.net\/problem\/AtCoder-(\w+)/i);
+      if (match) { full = match[1]; [contest, idx] = full.split('_'); origin = 'ac'; }
+      else {
+        match = url.match(/vjudge\.net\/problem\/CodeForces-(\d+)([A-Za-z]\w*)/i);
+        if (match) { contest = match[1]; idx = match[2]; origin = 'cf'; }
+        else {
+          match = url.match(/luogu\.com\.cn\/problem\/AT_(\w+)/i);
+          if (match) { full = match[1]; [contest, idx] = full.split('_'); origin = 'ac'; }
+          else {
+            match = url.match(/luogu\.com\.cn\/problem\/CF(\d+)([A-Za-z]\w*)/i);
+            if (match) { contest = match[1]; idx = match[2]; origin = 'cf'; }
+            else {
+              match = url.match(/atcoder\.jp\/contests\/([^\/]+)\/tasks\/(.+)/i);
+              if (match) {
+                contest = match[1];
+                full = match[2];
+                if (full.includes('_')) [contest, idx] = full.split('_');
+                else idx = full;
+                origin = 'ac';
+              } else {
+                match = url.match(/codeforces\.com\/problemset\/problem\/(\d+)\/([A-Za-z]\w*)/i);
+                if (match) { contest = match[1]; idx = match[2]; origin = 'cf'; }
+                else {
+                  match = url.match(/codeforces\.com\/contest\/(\d+)\/problem\/([A-Za-z]\w*)/i);
+                  if (match) { contest = match[1]; idx = match[2]; origin = 'cf'; }
+                }
+              }
+            }
+          }
+        }
+      }
+      if (!origin) {
+        const s = raw.replace(/\s+/g, '');
+        const up = s.toUpperCase();
+        let core = s;
+        if (up.startsWith('CODEFORCES-')) { core = s.slice(10); origin = 'cf'; }
+        else if (up.startsWith('CF')) { core = s.slice(2); origin = 'cf'; }
+        else if (up.startsWith('ATCODER-')) { core = s.slice(8); origin = 'ac'; }
+        else if (up.startsWith('AT_')) { core = s.slice(3); origin = 'ac'; }
+        if (origin === 'cf') {
+          const m = core.match(/^(\d+)([A-Za-z]\w*)$/);
+          if (m) { contest = m[1]; idx = m[2].toUpperCase(); }
+        } else if (origin === 'ac') {
+          const m = core.match(/^([A-Za-z]+\d+)_([A-Za-z]\w*)$/i);
+          if (m) { contest = m[1]; idx = m[2].toLowerCase(); }
+        }
+      }
+      if (!contest || !idx) {
+        alert('无法解析输入，请输入题面链接或编号');
+        return;
+      }
+      const platforms = [];
+      if (origin === 'cf') {
+        platforms.push({ name: 'Vjudge', url: `https://vjudge.net/problem/CodeForces-${contest}${idx}` });
+        platforms.push({ name: '洛谷 (Luogu)', url: `https://www.luogu.com.cn/problem/CF${contest}${idx}` });
+        platforms.push({ name: 'Codeforces', url: `https://codeforces.com/problemset/problem/${contest}/${idx}` });
+      } else if (origin === 'ac') {
+        full = `${contest}_${idx}`;
+        platforms.push({ name: 'Vjudge', url: `https://vjudge.net/problem/AtCoder-${full}` });
+        platforms.push({ name: '洛谷 (Luogu)', url: `https://www.luogu.com.cn/problem/AT_${full}` });
+        platforms.push({ name: 'AtCoder', url: `https://atcoder.jp/contests/${contest}/tasks/${full}` });
+      }
+      const ul = document.getElementById('linksList');
+      ul.innerHTML = '';
+      platforms.forEach(p => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = p.url;
+        a.target = '_blank';
+        a.textContent = `${p.name}: ${p.url}`;
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>
